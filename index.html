@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guia Completo — Redes & Gestão de Contas</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+  --bg:#0a0e1a; --surface:#111827; --surface2:#1a2236;
+  --r-accent:#00d4ff; --r-accent2:#7c3aed; --r-accent3:#10b981;
+  --g-accent:#f0b429; --g-accent2:#e07b00; --g-accent3:#10b981;
+  --danger:#ef4444; --text:#e2e8f0; --muted:#64748b; --border:#1e2d45;
+  --accent:var(--r-accent); --accent2:var(--r-accent2); --accent3:var(--r-accent3);
+}
+body.tab-gestao {
+  --bg:#0d0a00; --surface:#141009; --surface2:#1c1608;
+  --accent:var(--g-accent); --accent2:var(--g-accent2); --accent3:var(--g-accent3);
+  --muted:#7a6a40; --border:#2a200a; --text:#f0e6c8;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;min-height:100vh;overflow-x:hidden;transition:background 0.4s,color 0.4s;}
+
+/* HEADER */
+header{text-align:center;padding:36px 24px 24px;position:relative;}
+.hgrid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,212,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.04) 1px,transparent 1px);background-size:40px 40px;mask-image:radial-gradient(ellipse 80% 60% at 50% 0%,black,transparent);}
+body.tab-gestao .hgrid{background-image:linear-gradient(rgba(240,180,41,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(240,180,41,0.04) 1px,transparent 1px);}
+header h1{font-family:'Space Mono',monospace;font-size:clamp(1.1rem,3.5vw,1.8rem);font-weight:700;color:var(--accent);position:relative;}
+header p{color:var(--muted);font-size:0.82rem;margin-top:5px;position:relative;}
+
+/* TAB SWITCHER */
+.tab-bar{display:flex;justify-content:center;gap:10px;padding:16px 20px;position:sticky;top:0;z-index:200;background:rgba(10,14,26,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);}
+body.tab-gestao .tab-bar{background:rgba(13,10,0,0.95);}
+.tab-btn{padding:8px 22px;border-radius:999px;border:1.5px solid var(--border);background:var(--surface);color:var(--muted);font-size:0.78rem;font-family:'Space Mono',monospace;cursor:pointer;transition:all 0.25s;white-space:nowrap;}
+.tab-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(0,212,255,0.08);}
+body.tab-gestao .tab-btn.active{background:rgba(240,180,41,0.08);}
+
+/* PILL NAV */
+.nav-scroll{display:flex;gap:7px;padding:10px 16px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border);background:rgba(10,14,26,0.92);backdrop-filter:blur(8px);}
+body.tab-gestao .nav-scroll{background:rgba(13,10,0,0.92);}
+.nav-scroll::-webkit-scrollbar{display:none;}
+.pill{flex-shrink:0;padding:5px 12px;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-size:0.68rem;font-family:'Space Mono',monospace;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.pill:hover,.pill.active{border-color:var(--accent);color:var(--accent);background:rgba(0,212,255,0.08);}
+body.tab-gestao .pill:hover,body.tab-gestao .pill.active{background:rgba(240,180,41,0.08);}
+
+/* MODULE */
+.module{display:none;}
+.module.active{display:block;}
+main{max-width:860px;margin:0 auto;padding:24px 14px 80px;}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px;opacity:0;transform:translateY(20px);transition:opacity 0.5s,transform 0.5s,background 0.4s,border-color 0.4s;position:relative;overflow:hidden;}
+.card.visible{opacity:1;transform:translateY(0);}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));opacity:0.7;}
+.card-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px;}
+.card-num{font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--accent);background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.25);border-radius:8px;padding:3px 9px;flex-shrink:0;margin-top:2px;}
+body.tab-gestao .card-num{background:rgba(240,180,41,0.1);border-color:rgba(240,180,41,0.25);}
+.card-title{font-size:0.95rem;font-weight:600;color:var(--text);line-height:1.4;}
+.diagram{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:20px;min-height:130px;display:flex;align-items:center;justify-content:center;position:relative;}
+.answer{margin-top:14px;padding-top:14px;border-top:1px solid var(--border);font-size:0.8rem;color:var(--muted);line-height:1.7;}
+.answer strong{color:var(--accent);}
+.kw{color:var(--accent3);font-family:'Space Mono',monospace;font-size:0.76rem;}
+.section-title{font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin:32px 0 14px;padding-left:12px;border-left:2px solid var(--accent);}
+
+/* ===== SHARED DIAGRAM COMPONENTS ===== */
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes tag-in{from{opacity:0;transform:scale(0.8)}to{opacity:1;transform:scale(1)}}
+@keyframes pulse-right{from{left:-40%}to{left:140%}}
+@keyframes node-pulse{0%,100%{r:7}50%{r:9}}
+@keyframes dot-pulse{0%,100%{box-shadow:0 0 0 0 rgba(240,180,41,0)}50%{box-shadow:0 0 0 4px rgba(240,180,41,0.1)}}
+@keyframes spoke-in{from{opacity:0;transform:scale(0.7)}to{opacity:1;transform:scale(1)}}
+@keyframes tag-in2{from{opacity:0;transform:scale(0.8)}to{opacity:1;transform:scale(1)}}
+@keyframes blink-border{0%,100%{border-color:rgba(0,212,255,0.3)}50%{border-color:rgba(0,212,255,0.8);box-shadow:0 0 8px rgba(0,212,255,0.2)}}
+@keyframes packet-move{0%{transform:translateX(0);opacity:0.7}100%{transform:translateX(200px);opacity:0}}
+
+/* REDES components */
+.net-ring{display:flex;align-items:center;}
+.dev-box{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:0.63rem;color:var(--muted);font-family:'Space Mono',monospace;}
+.dev-icon{width:42px;height:42px;border-radius:10px;background:var(--surface);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.1rem;transition:border-color 0.3s,box-shadow 0.3s;}
+.dev-icon.active{border-color:#00d4ff;box-shadow:0 0 12px rgba(0,212,255,0.3);}
+.wire{width:32px;height:2px;background:var(--border);position:relative;overflow:hidden;}
+.wire-pulse{position:absolute;top:0;left:-100%;width:40%;height:100%;background:linear-gradient(90deg,transparent,#00d4ff,transparent);animation:pulse-right 2s linear infinite;}
+.share-icons{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;}
+.share-item{display:flex;flex-direction:column;align-items:center;gap:7px;font-size:0.67rem;color:var(--muted);font-family:'Space Mono',monospace;}
+.share-bubble{width:52px;height:52px;border-radius:13px;background:rgba(0,212,255,0.08);border:1.5px solid rgba(0,212,255,0.25);display:flex;align-items:center;justify-content:center;font-size:1.4rem;animation:float 3s ease-in-out infinite;}
+.pros-cons{display:flex;gap:10px;flex-wrap:wrap;width:100%;justify-content:center;}
+.tag{padding:7px 13px;border-radius:999px;font-size:0.7rem;font-family:'Space Mono',monospace;border:1px solid;animation:tag-in 0.4s ease backwards;}
+.tag.pro{border-color:#10b981;color:#10b981;background:rgba(16,185,129,0.08);}
+.tag.con{border-color:#ef4444;color:#ef4444;background:rgba(239,68,68,0.08);}
+.tag.gold{border-color:#f0b429;color:#f0b429;background:rgba(240,180,41,0.08);}
+.tag.green{border-color:#10b981;color:#10b981;background:rgba(16,185,129,0.08);}
+.tag.red{border-color:#ef4444;color:#ef4444;background:rgba(239,68,68,0.08);}
+.network-types{display:flex;flex-direction:column;gap:9px;width:100%;}
+.net-type-row{display:flex;align-items:center;gap:11px;padding:9px 13px;border-radius:10px;border:1px solid var(--border);background:var(--surface);}
+.net-badge{font-family:'Space Mono',monospace;font-size:0.68rem;font-weight:700;padding:3px 9px;border-radius:6px;flex-shrink:0;}
+.net-bar-wrap{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
+.net-bar{height:100%;border-radius:3px;width:0;transition:width 1.2s ease;}
+.net-label{font-size:0.65rem;color:var(--muted);font-family:'Space Mono',monospace;flex-shrink:0;}
+.pan-lan{display:flex;gap:14px;justify-content:center;align-items:center;flex-wrap:wrap;}
+.zone{border-radius:14px;border:1.5px dashed;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px 18px;gap:7px;font-family:'Space Mono',monospace;font-size:0.68rem;position:relative;}
+.zone-label{font-size:0.78rem;font-weight:700;}
+.wan-globe{display:flex;flex-direction:column;align-items:center;gap:11px;}
+.globe{font-size:3.5rem;animation:spin-slow 8s linear infinite;display:inline-block;}
+@keyframes spin-slow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.globe-label{font-family:'Space Mono',monospace;font-size:0.73rem;color:#00d4ff;}
+.cs-diagram{display:flex;align-items:center;gap:0;justify-content:center;width:100%;}
+.cs-box{display:flex;flex-direction:column;align-items:center;gap:6px;padding:13px 16px;border-radius:12px;border:1.5px solid;min-width:95px;font-family:'Space Mono',monospace;font-size:0.63rem;}
+.cs-arrow{display:flex;flex-direction:column;align-items:center;gap:5px;padding:0 9px;font-size:0.58rem;color:var(--muted);font-family:'Space Mono',monospace;}
+.arrow-line{width:50px;height:2px;position:relative;overflow:hidden;}
+.arrow-req{background:#00d4ff;}
+.arrow-res{background:#10b981;}
+.arrow-line::after{content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;background:rgba(255,255,255,0.5);animation:pulse-right 1.5s linear infinite;}
+.hw-grid{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+.hw-card{display:flex;flex-direction:column;align-items:center;gap:7px;padding:14px;border-radius:12px;background:var(--surface);border:1.5px solid var(--border);min-width:85px;transition:border-color 0.3s;font-family:'Space Mono',monospace;font-size:0.63rem;color:var(--muted);text-align:center;}
+.hw-card:hover{border-color:#00d4ff;}
+.hw-icon{font-size:1.8rem;}
+.hw-name{font-weight:700;color:var(--text);font-size:0.7rem;}
+.protocol-stack{display:flex;flex-direction:column;gap:6px;width:100%;max-width:310px;}
+.proto-layer{padding:9px 14px;border-radius:8px;font-family:'Space Mono',monospace;font-size:0.7rem;display:flex;align-items:center;gap:9px;transform:translateX(-18px);opacity:0;transition:transform 0.4s ease,opacity 0.4s ease;}
+.proto-layer.in{transform:translateX(0);opacity:1;}
+.proto-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.wire-wireless{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;}
+.ww-card{flex:1;min-width:125px;max-width:170px;padding:16px;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);display:flex;flex-direction:column;align-items:center;gap:9px;font-family:'Space Mono',monospace;font-size:0.66rem;color:var(--muted);text-align:center;}
+.ww-icon{font-size:2rem;}
+.ww-title{font-size:0.78rem;font-weight:700;color:var(--text);}
+.speed-bar-wrap{width:100%;height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
+.speed-bar{height:100%;border-radius:3px;width:0;transition:width 1.4s ease;}
+.topo-grid{display:flex;gap:22px;justify-content:center;flex-wrap:wrap;}
+.topo-diagram{display:flex;flex-direction:column;align-items:center;gap:7px;}
+.topo-svg{width:115px;height:95px;}
+.topo-name{font-family:'Space Mono',monospace;font-size:0.7rem;color:#00d4ff;}
+.inet-web{display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;}
+.inet-outer{width:100%;padding:18px;border-radius:13px;border:1.5px dashed rgba(0,212,255,0.4);background:rgba(0,212,255,0.04);display:flex;flex-direction:column;align-items:center;gap:11px;position:relative;}
+.inet-label-top{position:absolute;top:-10px;left:16px;background:var(--surface2);padding:0 8px;font-family:'Space Mono',monospace;font-size:0.66rem;color:#00d4ff;}
+.inet-inner{padding:12px 22px;border-radius:10px;border:1.5px dashed rgba(124,58,237,0.5);background:rgba(124,58,237,0.08);font-family:'Space Mono',monospace;font-size:0.73rem;color:#a78bfa;text-align:center;position:relative;}
+.inet-services{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;}
+.inet-service{padding:4px 9px;border-radius:6px;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);font-family:'Space Mono',monospace;font-size:0.63rem;color:var(--muted);}
+.inet-service.highlight{background:rgba(124,58,237,0.15);border-color:rgba(124,58,237,0.4);color:#a78bfa;}
+.ip-demo{display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;}
+.ip-device-row{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;}
+.ip-dev{display:flex;flex-direction:column;align-items:center;gap:7px;font-family:'Space Mono',monospace;font-size:0.63rem;}
+.ip-icon{font-size:1.8rem;}
+.ip-badge{padding:4px 11px;border-radius:6px;background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.3);color:#00d4ff;font-size:0.7rem;animation:blink-border 2s ease-in-out infinite;}
+.tcpip{display:flex;flex-direction:column;align-items:center;gap:11px;width:100%;}
+.tcpip-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+.tcpip-box{padding:14px 18px;border-radius:12px;border:1.5px solid;flex:1;min-width:125px;max-width:175px;font-family:'Space Mono',monospace;font-size:0.66rem;text-align:center;}
+.tcpip-title{font-size:0.95rem;font-weight:700;margin-bottom:5px;}
+.packet-anim{display:flex;align-items:center;gap:4px;font-family:'Space Mono',monospace;font-size:0.63rem;color:var(--muted);}
+.packet{width:18px;height:13px;border-radius:3px;background:#00d4ff;opacity:0.7;animation:packet-move 3s linear infinite;}
+.packet:nth-child(2){animation-delay:0.5s;background:#10b981;}
+.packet:nth-child(4){animation-delay:1s;}
+.packet:nth-child(6){animation-delay:1.5s;background:#10b981;}
+
+/* GESTAO components */
+.float-grid{display:flex;gap:15px;flex-wrap:wrap;justify-content:center;}
+.float-item{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:0.63rem;color:var(--muted);font-family:'Space Mono',monospace;}
+.fbubble{width:50px;height:50px;border-radius:13px;background:rgba(240,180,41,0.08);border:1.5px solid rgba(240,180,41,0.2);display:flex;align-items:center;justify-content:center;font-size:1.3rem;animation:float 3s ease-in-out infinite;}
+.funnel{display:flex;flex-direction:column;align-items:center;gap:2px;width:100%;max-width:310px;}
+.funnel-step{border-radius:8px;padding:9px 13px;text-align:center;font-family:'Space Mono',monospace;font-size:0.67rem;border:1px solid rgba(240,180,41,0.2);transform:scaleX(0);opacity:0;transition:transform 0.4s ease,opacity 0.4s ease;width:100%;}
+.funnel-step.in{transform:scaleX(1);opacity:1;}
+.funnel-arrow{color:var(--muted);font-size:0.78rem;}
+.flow-g{display:flex;align-items:center;gap:5px;flex-wrap:wrap;justify-content:center;}
+.flow-step-g{padding:9px 11px;border-radius:10px;border:1.5px solid rgba(240,180,41,0.25);background:rgba(240,180,41,0.06);font-family:'Space Mono',monospace;font-size:0.63rem;color:#f0b429;text-align:center;transform:translateY(14px);opacity:0;transition:transform 0.4s ease,opacity 0.4s ease;}
+.flow-step-g.in{transform:translateY(0);opacity:1;}
+.flow-arrow-g{color:var(--muted);font-size:0.83rem;}
+.timeline-g{display:flex;flex-direction:column;gap:0;width:100%;}
+.tl-item{display:flex;gap:13px;padding-bottom:13px;}
+.tl-item:last-child{padding-bottom:0;}
+.tl-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
+.tl-dot{width:25px;height:25px;border-radius:50%;background:rgba(240,180,41,0.1);border:1.5px solid #f0b429;display:flex;align-items:center;justify-content:center;font-size:0.72rem;animation:dot-pulse 2s ease-in-out infinite;}
+.tl-line{width:1px;flex:1;background:var(--border);min-height:13px;}
+.tl-item:last-child .tl-line{display:none;}
+.tl-title{font-family:'Space Mono',monospace;font-size:0.7rem;color:#f0b429;font-weight:700;}
+.tl-desc{font-size:0.7rem;color:var(--muted);margin-top:2px;}
+.rel-diagram{display:flex;flex-direction:column;align-items:center;gap:9px;width:100%;}
+.rel-center{padding:11px 20px;border-radius:12px;background:rgba(240,180,41,0.1);border:1.5px solid rgba(240,180,41,0.4);font-family:'Space Mono',monospace;font-size:0.76rem;color:#f0b429;font-weight:700;text-align:center;}
+.rel-spokes{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;}
+.rel-spoke{padding:7px 10px;border-radius:8px;border:1px solid rgba(240,180,41,0.15);background:rgba(240,180,41,0.04);font-family:'Space Mono',monospace;font-size:0.62rem;color:var(--muted);animation:spoke-in 0.4s ease backwards;}
+.matrix-g{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;}
+.mat-cell{padding:11px;border-radius:10px;border:1px solid var(--border);font-family:'Space Mono',monospace;font-size:0.62rem;text-align:center;transition:border-color 0.3s;}
+.mat-cell:hover{border-color:#f0b429;}
+.mat-cell .icon{font-size:1.25rem;margin-bottom:3px;}
+.mat-cell .name{color:#f0b429;font-weight:700;font-size:0.68rem;}
+.mat-cell .desc{color:var(--muted);margin-top:2px;}
+.kpi-grid{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;}
+.kpi-card{padding:13px;border-radius:12px;min-width:78px;text-align:center;border:1.5px solid rgba(240,180,41,0.2);background:var(--surface);font-family:'Space Mono',monospace;}
+.kpi-val{font-size:1.3rem;font-weight:700;color:#f0b429;}
+.kpi-label{font-size:0.57rem;color:var(--muted);margin-top:3px;}
+.tier-row{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;width:100%;}
+.tier-card{flex:1;min-width:90px;max-width:140px;padding:13px 10px;border-radius:12px;text-align:center;border:1.5px solid;font-family:'Space Mono',monospace;display:flex;flex-direction:column;gap:6px;transform:translateY(17px);opacity:0;transition:transform 0.5s ease,opacity 0.5s ease;}
+.tier-card.in{transform:translateY(0);opacity:1;}
+.tier-icon{font-size:1.5rem;}
+.tier-name{font-size:0.73rem;font-weight:700;}
+.tier-desc{font-size:0.59rem;color:var(--muted);}
+.bar-chart{display:flex;align-items:flex-end;gap:8px;height:88px;width:100%;padding:0 4px;}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;}
+.bar-fill{width:100%;border-radius:5px 5px 0 0;background:linear-gradient(180deg,#f0b429,#e07b00);height:0;transition:height 1.2s ease;min-height:4px;}
+.ring-wrap{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;}
+.ring-item{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.ring-svg{width:74px;height:74px;transform:rotate(-90deg);}
+.ring-bg{fill:none;stroke:var(--border);stroke-width:6;}
+.ring-fg{fill:none;stroke-width:6;stroke-linecap:round;stroke-dasharray:188;stroke-dashoffset:188;transition:stroke-dashoffset 1.4s ease;}
+.ring-label{font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--muted);text-align:center;}
+.ring-box{position:relative;width:74px;height:74px;}
+.ring-val{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(90deg);font-family:'Space Mono',monospace;font-size:0.68rem;font-weight:700;color:#f0b429;}
+.cmp-wrap{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;width:100%;}
+.cmp-box{flex:1;min-width:115px;max-width:175px;padding:14px;border-radius:12px;border:1.5px solid;font-family:'Space Mono',monospace;font-size:0.63rem;text-align:center;}
+.cmp-title{font-size:0.82rem;font-weight:700;margin-bottom:7px;}
+.sig-table{width:100%;border-collapse:collapse;font-family:'Space Mono',monospace;font-size:0.66rem;}
+.sig-table th{padding:8px 10px;background:rgba(240,180,41,0.08);color:#f0b429;text-align:left;border-bottom:1px solid var(--border);}
+.sig-table td{padding:7px 10px;border-top:1px solid var(--border);color:var(--muted);}
+.sig-table tr:hover td{background:rgba(240,180,41,0.04);}
+.sig-table td:first-child{color:#f0b429;font-weight:700;}
+.sig-table td:nth-child(2){color:var(--text);}
+.cf-step{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:9px;border:1px solid var(--border);font-family:'Space Mono',monospace;font-size:0.66rem;transform:translateX(-14px);opacity:0;transition:transform 0.4s ease,opacity 0.4s ease;}
+.cf-step.in{transform:translateX(0);opacity:1;}
+.cf-icon{font-size:1rem;flex-shrink:0;}
+.plan-grid{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;width:100%;}
+.plan-box{flex:1;min-width:88px;max-width:125px;padding:13px 10px;border-radius:12px;border:1.5px solid rgba(240,180,41,0.25);font-family:'Space Mono',monospace;font-size:0.63rem;text-align:center;transform:translateY(14px);opacity:0;transition:transform 0.4s ease,opacity 0.4s ease;}
+.plan-box.in{transform:translateY(0);opacity:1;}
+.plan-day{font-size:0.95rem;font-weight:700;color:#f0b429;margin-bottom:5px;}
+.plan-desc{color:var(--muted);font-size:0.6rem;}
+.cs-diagram-g{display:flex;align-items:center;gap:0;justify-content:center;width:100%;}
+.cs-box-g{display:flex;flex-direction:column;align-items:center;gap:6px;padding:13px 16px;border-radius:12px;border:1.5px solid;min-width:95px;font-family:'Space Mono',monospace;font-size:0.63rem;}
+.cs-arrow-mid{display:flex;flex-direction:column;align-items:center;gap:5px;padding:0 9px;font-size:0.57rem;color:var(--muted);font-family:'Space Mono',monospace;}
+.bar-label{font-family:'Space Mono',monospace;font-size:0.57rem;color:var(--muted);text-align:center;}
+</style>
+</head>
+<body>
+<header>
+  <div class="hgrid"></div>
+  <h1 id="main-title">// GUIA COMPLETO DE ESTUDO</h1>
+  <p id="main-sub">Redes de Computadores · Gestão de Contas — tudo num só lugar</p>
+</header>
+
+<!-- TAB SWITCHER -->
+<div class="tab-bar">
+  <button class="tab-btn active" id="btn-redes" onclick="switchTab('redes')">🌐 Redes de Computadores</button>
+  <button class="tab-btn" id="btn-gestao" onclick="switchTab('gestao')">💼 Gestão de Contas</button>
+</div>
+
+<!-- ==================== MODULE: REDES ==================== -->
+<div class="module active" id="mod-redes">
+<nav class="nav-scroll" id="nav-redes">
+  <button class="pill active" onclick="goToR(1)">01 Definição</button>
+  <button class="pill" onclick="goToR(2)">02 Objetivo</button>
+  <button class="pill" onclick="goToR(3)">03 Vantagens</button>
+  <button class="pill" onclick="goToR(4)">04 Riscos</button>
+  <button class="pill" onclick="goToR(5)">05 LAN/MAN/WAN</button>
+  <button class="pill" onclick="goToR(6)">06 PAN vs LAN</button>
+  <button class="pill" onclick="goToR(7)">07 Internet=WAN</button>
+  <button class="pill" onclick="goToR(8)">08 Servidor/Cliente</button>
+  <button class="pill" onclick="goToR(9)">09 Hardware</button>
+  <button class="pill" onclick="goToR(10)">10 Protocolos</button>
+  <button class="pill" onclick="goToR(11)">11 Fio vs Sem-fio</button>
+  <button class="pill" onclick="goToR(12)">12 Topologia</button>
+  <button class="pill" onclick="goToR(13)">13 Internet vs Web</button>
+  <button class="pill" onclick="goToR(14)">14 IP</button>
+  <button class="pill" onclick="goToR(15)">15 TCP/IP</button>
+</nav>
+<main>
+
+<div class="card" id="r1"><div class="card-header"><span class="card-num">01</span><span class="card-title">O que são redes de computadores?</span></div>
+<div class="diagram"><div class="net-ring">
+  <div class="dev-box"><div class="dev-icon" id="d1">💻</div>PC</div>
+  <div class="wire"><div class="wire-pulse"></div></div>
+  <div class="dev-box"><div class="dev-icon" id="d2">📱</div>Mobile</div>
+  <div class="wire"><div class="wire-pulse" style="animation-delay:0.5s"></div></div>
+  <div class="dev-box"><div class="dev-icon" id="d3">🖨️</div>Impressora</div>
+  <div class="wire"><div class="wire-pulse" style="animation-delay:1s"></div></div>
+  <div class="dev-box"><div class="dev-icon" id="d4">🖥️</div>Servidor</div>
+</div></div>
+<div class="answer">Conjunto de <strong>2+ dispositivos conectados</strong> que trocam dados e compartilham recursos, seguindo regras chamadas <span class="kw">protocolos</span>.</div></div>
+
+<div class="card" id="r2"><div class="card-header"><span class="card-num">02</span><span class="card-title">Qual o objetivo principal de uma rede?</span></div>
+<div class="diagram"><div class="share-icons">
+  <div class="share-item"><div class="share-bubble" style="animation-delay:0s">🌐</div>Internet</div>
+  <div class="share-item"><div class="share-bubble" style="animation-delay:0.4s">📁</div>Arquivos</div>
+  <div class="share-item"><div class="share-bubble" style="animation-delay:0.8s">🖨️</div>Impressora</div>
+  <div class="share-item"><div class="share-bubble" style="animation-delay:1.2s">💬</div>Comunicação</div>
+</div></div>
+<div class="answer"><strong>Compartilhar recursos:</strong> internet, arquivos, impressoras — e permitir comunicação entre dispositivos e utilizadores.</div></div>
+
+<div class="card" id="r3"><div class="card-header"><span class="card-num">03</span><span class="card-title">3 vantagens de usar uma rede</span></div>
+<div class="diagram"><div class="pros-cons">
+  <span class="tag pro" style="animation-delay:0.1s">✓ Compartilhamento de recursos</span>
+  <span class="tag pro" style="animation-delay:0.3s">✓ Troca rápida de dados</span>
+  <span class="tag pro" style="animation-delay:0.5s">✓ Comunicação: email, chat, vídeo</span>
+</div></div>
+<div class="answer">Partilhar impressoras e hardware caro, trocar ficheiros instantaneamente, e comunicar por email ou videochamada.</div></div>
+
+<div class="card" id="r4"><div class="card-header"><span class="card-num">04</span><span class="card-title">2 desvantagens / riscos</span></div>
+<div class="diagram"><div class="pros-cons">
+  <span class="tag con" style="animation-delay:0.1s">✗ Segurança: vírus, hackers, vazamentos</span>
+  <span class="tag con" style="animation-delay:0.4s">✗ Dependência: se cai, ninguém acessa</span>
+</div></div>
+<div class="answer"><strong>Segurança</strong> — vulnerável a ataques. <strong>Dependência</strong> — falha na rede paralisa todos os acessos.</div></div>
+
+<div class="card" id="r5"><div class="card-header"><span class="card-num">05</span><span class="card-title">LAN, MAN e WAN — o que são?</span></div>
+<div class="diagram"><div class="network-types">
+  <div class="net-type-row"><span class="net-badge" style="background:rgba(0,212,255,0.1);color:#00d4ff;border:1px solid rgba(0,212,255,0.3)">LAN</span><div class="net-bar-wrap"><div class="net-bar" id="bar-lan" style="background:#00d4ff"></div></div><span class="net-label">Casa / Escritório</span></div>
+  <div class="net-type-row"><span class="net-badge" style="background:rgba(124,58,237,0.1);color:#a78bfa;border:1px solid rgba(124,58,237,0.3)">MAN</span><div class="net-bar-wrap"><div class="net-bar" id="bar-man" style="background:#7c3aed"></div></div><span class="net-label">Cidade inteira</span></div>
+  <div class="net-type-row"><span class="net-badge" style="background:rgba(16,185,129,0.1);color:#10b981;border:1px solid rgba(16,185,129,0.3)">WAN</span><div class="net-bar-wrap"><div class="net-bar" id="bar-wan" style="background:#10b981"></div></div><span class="net-label">Países / Continentes</span></div>
+</div></div>
+<div class="answer"><strong>LAN</strong> = Local (casa/prédio). <strong>MAN</strong> = Metropolitana (cidade). <strong>WAN</strong> = Ampla (países). Ex: Wi-Fi de casa → EDM Maputo → Internet.</div></div>
+
+<div class="card" id="r6"><div class="card-header"><span class="card-num">06</span><span class="card-title">Diferença entre PAN e LAN</span></div>
+<div class="diagram"><div class="pan-lan">
+  <div class="zone" style="border-color:rgba(245,158,11,0.5);min-width:95px;min-height:85px;"><span class="zone-label" style="color:#f59e0b">PAN</span><span style="font-size:1.5rem">🎧</span><span style="font-family:'Space Mono',monospace;font-size:0.62rem;color:var(--muted)">~10 metros</span></div>
+  <div class="zone" style="border-color:rgba(0,212,255,0.5);min-width:170px;min-height:125px;padding:18px;"><span class="zone-label" style="color:#00d4ff">LAN</span><div style="display:flex;gap:8px;margin-top:4px"><span style="font-size:1.1rem">💻</span><span style="font-size:1.1rem">🖨️</span><span style="font-size:1.1rem">📱</span></div><span style="font-family:'Space Mono',monospace;font-size:0.62rem;color:var(--muted)">Casa / Escritório</span></div>
+</div></div>
+<div class="answer"><strong>PAN</strong> = Personal (~10m). Ex: Bluetooth. <strong>LAN</strong> = Local, cobre casa ou escritório inteiro.</div></div>
+
+<div class="card" id="r7"><div class="card-header"><span class="card-num">07</span><span class="card-title">Internet é LAN, MAN ou WAN?</span></div>
+<div class="diagram"><div class="wan-globe"><div class="globe">🌍</div><div class="globe-label">WAN — conecta o mundo inteiro</div><div style="display:flex;gap:7px;flex-wrap:wrap;justify-content:center"><span style="font-family:'Space Mono',monospace;font-size:0.63rem;color:var(--muted);padding:3px 7px;border:1px solid var(--border);border-radius:4px">Moçambique</span><span style="font-family:'Space Mono',monospace;font-size:0.63rem;color:var(--muted);padding:3px 7px;border:1px solid var(--border);border-radius:4px">Portugal</span><span style="font-family:'Space Mono',monospace;font-size:0.63rem;color:var(--muted);padding:3px 7px;border:1px solid var(--border);border-radius:4px">Brasil</span></div></div></div>
+<div class="answer"><strong>WAN.</strong> Conecta redes do mundo todo, atravessa países e continentes.</div></div>
+
+<div class="card" id="r8"><div class="card-header"><span class="card-num">08</span><span class="card-title">O que é servidor e cliente?</span></div>
+<div class="diagram"><div class="cs-diagram">
+  <div class="cs-box" style="border-color:rgba(0,212,255,0.4);background:rgba(0,212,255,0.06)"><span style="font-size:1.6rem">📱</span><span style="color:#00d4ff;font-weight:700">CLIENTE</span><span style="color:var(--muted)">Teu celular</span></div>
+  <div class="cs-arrow"><span>pedido →</span><div class="arrow-line arrow-req"></div><div class="arrow-line arrow-res"></div><span>← resposta</span></div>
+  <div class="cs-box" style="border-color:rgba(124,58,237,0.4);background:rgba(124,58,237,0.06)"><span style="font-size:1.6rem">🖥️</span><span style="color:#a78bfa;font-weight:700">SERVIDOR</span><span style="color:var(--muted)">Google.com</span></div>
+</div></div>
+<div class="answer"><strong>Servidor</strong> = oferece serviços (ex: Google). <strong>Cliente</strong> = pede e usa o serviço (ex: teu celular).</div></div>
+
+<div class="card" id="r9"><div class="card-header"><span class="card-num">09</span><span class="card-title">Roteador, Switch e Modem</span></div>
+<div class="diagram"><div class="hw-grid">
+  <div class="hw-card"><div class="hw-icon">📡</div><div class="hw-name">MODEM</div><div>Traduz sinal<br>Casa ↔ Internet</div></div>
+  <div class="hw-card"><div class="hw-icon">🔀</div><div class="hw-name">ROTEADOR</div><div>Distribui internet<br>Cria Wi-Fi</div></div>
+  <div class="hw-card"><div class="hw-icon">🔌</div><div class="hw-name">SWITCH</div><div>Conecta PCs<br>por cabo (LAN)</div></div>
+</div></div>
+<div class="answer"><strong>Modem</strong> = porta de entrada. <strong>Roteador</strong> = distribui e cria Wi-Fi. <strong>Switch</strong> = conecta PCs na LAN por cabo.</div></div>
+
+<div class="card" id="r10"><div class="card-header"><span class="card-num">10</span><span class="card-title">O que são protocolos de rede?</span></div>
+<div class="diagram"><div class="protocol-stack" id="proto-stack">
+  <div class="proto-layer" style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2)"><div class="proto-dot" style="background:#ef4444"></div><span style="color:#ef4444;font-weight:700">HTTP/HTTPS</span><span style="color:var(--muted)">— Navegar sites</span></div>
+  <div class="proto-layer" style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2)"><div class="proto-dot" style="background:#f59e0b"></div><span style="color:#f59e0b;font-weight:700">TCP</span><span style="color:var(--muted)">— Dados completos e ordenados</span></div>
+  <div class="proto-layer" style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2)"><div class="proto-dot" style="background:#00d4ff"></div><span style="color:#00d4ff;font-weight:700">IP</span><span style="color:var(--muted)">— Endereço e rota</span></div>
+</div></div>
+<div class="answer">São as <strong>"regras da estrada"</strong> para dados trafegarem. Ex: <span class="kw">TCP/IP</span> (Internet), <span class="kw">HTTP</span> (sites).</div></div>
+
+<div class="card" id="r11"><div class="card-header"><span class="card-num">11</span><span class="card-title">Rede com fio vs sem fio</span></div>
+<div class="diagram"><div class="wire-wireless">
+  <div class="ww-card"><div class="ww-icon">🔌</div><div class="ww-title">Com Fio</div><div>Ethernet / Cabo</div><div class="speed-bar-wrap"><div class="speed-bar" id="speed-wire" style="background:#00d4ff"></div></div><div>Estável · Rápida</div></div>
+  <div class="ww-card"><div class="ww-icon">📶</div><div class="ww-title">Sem Fio</div><div>Wi-Fi · 4G · 5G</div><div class="speed-bar-wrap"><div class="speed-bar" id="speed-wifi" style="background:#7c3aed"></div></div><div>Prática · Interferência</div></div>
+</div></div>
+<div class="answer"><strong>Com fio</strong> = cabo Ethernet, estável e rápida. <strong>Sem fio</strong> = Wi-Fi/4G, prática mas sofre interferência.</div></div>
+
+<div class="card" id="r12"><div class="card-header"><span class="card-num">12</span><span class="card-title">O que é topologia? 2 tipos</span></div>
+<div class="diagram"><div class="topo-grid">
+  <div class="topo-diagram">
+    <svg class="topo-svg" viewBox="0 0 120 100">
+      <line x1="60" y1="50" x2="30" y2="20" stroke="#00d4ff" stroke-width="1.5" stroke-dasharray="4,2" opacity="0.5"/><line x1="60" y1="50" x2="90" y2="20" stroke="#00d4ff" stroke-width="1.5" stroke-dasharray="4,2" opacity="0.5"/><line x1="60" y1="50" x2="20" y2="70" stroke="#00d4ff" stroke-width="1.5" stroke-dasharray="4,2" opacity="0.5"/><line x1="60" y1="50" x2="100" y2="70" stroke="#00d4ff" stroke-width="1.5" stroke-dasharray="4,2" opacity="0.5"/>
+      <circle cx="60" cy="50" r="10" fill="#0a0e1a" stroke="#00d4ff" stroke-width="2"/><text x="60" y="54" text-anchor="middle" fill="#00d4ff" font-size="7" font-family="monospace">HUB</text>
+      <circle cx="30" cy="20" r="6" fill="#1a2236" stroke="#64748b" stroke-width="1.5"/><circle cx="90" cy="20" r="6" fill="#1a2236" stroke="#64748b" stroke-width="1.5"/><circle cx="20" cy="70" r="6" fill="#1a2236" stroke="#64748b" stroke-width="1.5"/><circle cx="100" cy="70" r="6" fill="#1a2236" stroke="#64748b" stroke-width="1.5"/>
+    </svg>
+    <span class="topo-name">Estrela</span><span style="font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--muted)">tudo liga no centro</span>
+  </div>
+  <div class="topo-diagram">
+    <svg class="topo-svg" viewBox="0 0 120 100">
+      <line x1="10" y1="50" x2="110" y2="50" stroke="#7c3aed" stroke-width="2" opacity="0.7"/>
+      <line x1="30" y1="50" x2="30" y2="25" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="3,2" opacity="0.6"/><line x1="60" y1="50" x2="60" y2="25" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="3,2" opacity="0.6"/><line x1="90" y1="50" x2="90" y2="25" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="3,2" opacity="0.6"/>
+      <circle cx="30" cy="22" r="7" fill="#1a2236" stroke="#a78bfa" stroke-width="1.5"/><circle cx="60" cy="22" r="7" fill="#1a2236" stroke="#a78bfa" stroke-width="1.5"/><circle cx="90" cy="22" r="7" fill="#1a2236" stroke="#a78bfa" stroke-width="1.5"/>
+    </svg>
+    <span class="topo-name" style="color:#a78bfa">Barramento</span><span style="font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--muted)">todos no mesmo cabo</span>
+  </div>
+</div></div>
+<div class="answer"><strong>Estrela</strong> = tudo liga no roteador central. <strong>Barramento</strong> = todos no mesmo cabo. Topologia = "mapa" das conexões.</div></div>
+
+<div class="card" id="r13"><div class="card-header"><span class="card-num">13</span><span class="card-title">Internet vs World Wide Web</span></div>
+<div class="diagram"><div class="inet-web"><div class="inet-outer"><span class="inet-label-top">🌐 INTERNET (a rodovia)</span><div class="inet-services"><span class="inet-service">📧 Email</span><span class="inet-service">📞 VoIP</span><span class="inet-service">🎮 Jogos</span><span class="inet-service highlight">🌐 World Wide Web</span><span class="inet-service">📁 FTP</span></div><div class="inet-inner"><span style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--surface2);padding:0 8px;font-family:'Space Mono',monospace;font-size:0.65rem;color:#a78bfa">🌐 WEB</span>HTTP · HTML · Sites · Navegador</div></div></div></div>
+<div class="answer"><strong>Internet</strong> = a infraestrutura/rodovia. <strong>Web</strong> = apenas um dos serviços que usa a Internet (os sites no navegador).</div></div>
+
+<div class="card" id="r14"><div class="card-header"><span class="card-num">14</span><span class="card-title">O que é IP? Para que serve?</span></div>
+<div class="diagram"><div class="ip-demo"><div class="ip-device-row">
+  <div class="ip-dev"><div class="ip-icon">💻</div><div class="ip-badge">192.168.1.2</div><div style="font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--muted)">Teu PC</div></div>
+  <div class="ip-dev"><div class="ip-icon">📱</div><div class="ip-badge">192.168.1.5</div><div style="font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--muted)">Teu Celular</div></div>
+  <div class="ip-dev"><div class="ip-icon">🖥️</div><div class="ip-badge">142.250.1.1</div><div style="font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--muted)">Google</div></div>
+</div></div></div>
+<div class="answer"><strong>IP</strong> = Internet Protocol. O <strong>"endereço da casa"</strong> do dispositivo na rede. Serve para identificar e localizar cada dispositivo.</div></div>
+
+<div class="card" id="r15"><div class="card-header"><span class="card-num">15</span><span class="card-title">O que significa TCP/IP?</span></div>
+<div class="diagram"><div class="tcpip"><div class="tcpip-row">
+  <div class="tcpip-box" style="border-color:rgba(0,212,255,0.4);background:rgba(0,212,255,0.06)"><div class="tcpip-title" style="color:#00d4ff">IP</div><div style="color:var(--muted)">Internet Protocol</div><div style="margin-top:7px;color:var(--muted)">📍 Endereço e Rota</div></div>
+  <div class="tcpip-box" style="border-color:rgba(16,185,129,0.4);background:rgba(16,185,129,0.06)"><div class="tcpip-title" style="color:#10b981">TCP</div><div style="color:var(--muted)">Transmission Control</div><div style="margin-top:7px;color:var(--muted)">✅ Dados completos e ordenados</div></div>
+</div><div class="packet-anim"><span>pacotes →</span><div class="packet"></div><div class="packet"></div><div class="packet"></div><div class="packet"></div></div></div></div>
+<div class="answer"><span class="kw">IP</span> = endereço/rota. <span class="kw">TCP</span> = garante dados completos e na ordem certa. Juntos = regra principal da Internet.</div></div>
+
+</main>
+</div>
+
+<!-- ==================== MODULE: GESTAO ==================== -->
+<div class="module" id="mod-gestao">
+<nav class="nav-scroll" id="nav-gestao">
+  <button class="pill active" onclick="goToG(1)">01 O que faz</button>
+  <button class="pill" onclick="goToG(2)">02 vs Vendas</button>
+  <button class="pill" onclick="goToG(3)">03 Priorizar</button>
+  <button class="pill" onclick="goToG(4)">04 Ciclo de Vida</button>
+  <button class="pill" onclick="goToG(5)">05 Customer Success</button>
+  <button class="pill" onclick="goToG(6)">06 Insatisfeito</button>
+  <button class="pill" onclick="goToG(7)">07 Upsell/Cross-sell</button>
+  <button class="pill" onclick="goToG(8)">08 Reunião QBR</button>
+  <button class="pill" onclick="goToG(9)">09 Métricas</button>
+  <button class="pill" onclick="goToG(10)">10 Expectativas</button>
+  <button class="pill" onclick="goToG(11)">11 CRM</button>
+  <button class="pill" onclick="goToG(12)">12 Oportunidades</button>
+  <button class="pill" onclick="goToG(13)">13 30-60-90 dias</button>
+  <button class="pill" onclick="goToG(14)">14 Equipas internas</button>
+  <button class="pill" onclick="goToG(15)">15 SLA</button>
+  <button class="pill" onclick="goToG(16)">16 Medir sucesso</button>
+  <button class="pill" onclick="goToG(17)">17 Retenção</button>
+  <button class="pill" onclick="goToG(18)">18 Segmentação</button>
+  <button class="pill" onclick="goToG(19)">Siglas</button>
+  <button class="pill" onclick="goToG(20)">Termos</button>
+</nav>
+<main>
+
+<div class="section-title">— O Papel do Gestor de Contas</div>
+
+<div class="card" id="g1"><div class="card-header"><span class="card-num">01</span><span class="card-title">O que faz um Gestor de Contas?</span></div>
+<div class="diagram"><div class="float-grid">
+  <div class="float-item"><div class="fbubble" style="animation-delay:0s">🤝</div>Manter relação</div>
+  <div class="float-item"><div class="fbubble" style="animation-delay:0.3s">🛠️</div>Resolver problemas</div>
+  <div class="float-item"><div class="fbubble" style="animation-delay:0.6s">🔍</div>Novas necessidades</div>
+  <div class="float-item"><div class="fbubble" style="animation-delay:0.9s">🔒</div>Manter o cliente</div>
+</div></div>
+<div class="answer">É a pessoa responsável por <strong>acompanhar o cliente depois da venda</strong>, manter bom relacionamento, resolver problemas e identificar novas necessidades.</div></div>
+
+<div class="card" id="g2"><div class="card-header"><span class="card-num">02</span><span class="card-title">Diferença entre Gestor de Contas e Vendas?</span></div>
+<div class="diagram"><div class="cmp-wrap">
+  <div class="cmp-box" style="border-color:rgba(239,68,68,0.4);background:rgba(239,68,68,0.05)"><div class="cmp-title" style="color:#ef4444">🎯 Vendas (Sales)</div><div style="color:var(--muted)">Procura e <strong style="color:var(--text)">conquista</strong> novos clientes</div><div style="margin-top:7px;font-size:0.6rem;color:var(--muted)">Foco: aquisição</div></div>
+  <div style="display:flex;align-items:center;font-size:1.1rem;color:var(--muted)">vs</div>
+  <div class="cmp-box" style="border-color:rgba(240,180,41,0.4);background:rgba(240,180,41,0.05)"><div class="cmp-title" style="color:#f0b429">🧑‍💼 Gestor (AM)</div><div style="color:var(--muted)"><strong style="color:var(--text)">Acompanha</strong> quem já comprou e faz crescer</div><div style="margin-top:7px;font-size:0.6rem;color:var(--muted)">Foco: retenção + expansão</div></div>
+</div></div>
+<div class="answer"><strong>Vendas</strong> = conquistar novos. <strong>Gestor (AM)</strong> = acompanhar, manter e expandir os existentes.</div></div>
+
+<div class="card" id="g3"><div class="card-header"><span class="card-num">03</span><span class="card-title">Como priorizas os clientes da tua carteira?</span></div>
+<div class="diagram"><div class="tier-row" id="tier-g3">
+  <div class="tier-card" style="border-color:rgba(240,180,41,0.6);background:rgba(240,180,41,0.06)"><div class="tier-icon">💰</div><div class="tier-name" style="color:#f0b429">Alto valor</div><div class="tier-desc">ARR/MRR alto — máxima atenção</div></div>
+  <div class="tier-card" style="border-color:rgba(16,185,129,0.5);background:rgba(16,185,129,0.05)"><div class="tier-icon">📈</div><div class="tier-name" style="color:#10b981">Potencial</div><div class="tier-desc">Pode crescer — investir</div></div>
+  <div class="tier-card" style="border-color:rgba(239,68,68,0.4);background:rgba(239,68,68,0.05)"><div class="tier-icon">⚠️</div><div class="tier-name" style="color:#ef4444">Em risco</div><div class="tier-desc">Churn — agir urgente</div></div>
+</div></div>
+<div class="answer">Considera: <strong>quanto paga</strong> (ARR/MRR), <strong>potencial de crescimento</strong>, <strong>risco de churn</strong> e importância estratégica.</div></div>
+
+<div class="card" id="g4"><div class="card-header"><span class="card-num">04</span><span class="card-title">Ciclo de vida do cliente</span></div>
+<div class="diagram"><div class="timeline-g">
+  <div class="tl-item"><div class="tl-left"><div class="tl-dot">🔍</div><div class="tl-line"></div></div><div><div class="tl-title">1. Prospeção</div><div class="tl-desc">Identificar potenciais clientes</div></div></div>
+  <div class="tl-item"><div class="tl-left"><div class="tl-dot">🤝</div><div class="tl-line"></div></div><div><div class="tl-title">2. Aquisição</div><div class="tl-desc">Converter o prospect em cliente</div></div></div>
+  <div class="tl-item"><div class="tl-left"><div class="tl-dot">🚀</div><div class="tl-line"></div></div><div><div class="tl-title">3. Onboarding</div><div class="tl-desc">Integrar e ativar o cliente</div></div></div>
+  <div class="tl-item"><div class="tl-left"><div class="tl-dot">📈</div><div class="tl-line"></div></div><div><div class="tl-title">4. Crescimento</div><div class="tl-desc">Expandir o relacionamento</div></div></div>
+  <div class="tl-item"><div class="tl-left"><div class="tl-dot">🔒</div><div class="tl-line"></div></div><div><div class="tl-title">5. Retenção</div><div class="tl-desc">Fidelizar e renovar</div></div></div>
+  <div class="tl-item"><div class="tl-left"><div class="tl-dot" style="border-color:#ef4444">⚠️</div><div class="tl-line"></div></div><div><div class="tl-title" style="color:#ef4444">6. Churn (risco)</div><div class="tl-desc">Agir rápido antes de perder</div></div></div>
+</div></div>
+<div class="answer">Todo cliente passa por fases. O gestor atua em cada etapa para maximizar o <span class="kw">LTV — Lifetime Value</span>.</div></div>
+
+<div class="card" id="g5"><div class="card-header"><span class="card-num">05</span><span class="card-title">O que é Customer Success?</span></div>
+<div class="diagram"><div class="rel-diagram">
+  <div class="rel-center">⭐ Customer Success (CS)</div>
+  <div class="rel-spokes">
+    <span class="rel-spoke" style="animation-delay:0.1s">🎯 Ajuda o cliente a ter bons resultados</span>
+    <span class="rel-spoke" style="animation-delay:0.2s">📊 Acompanha uso do produto/serviço</span>
+    <span class="rel-spoke" style="animation-delay:0.3s">🔍 Identifica oportunidades</span>
+    <span class="rel-spoke" style="animation-delay:0.4s">🤝 Suporte ao Gestor de Contas</span>
+  </div>
+</div></div>
+<div class="answer"><strong>CS</strong> = área que ajuda o cliente a obter bons resultados com o produto. O Gestor usa essas informações para <span class="kw">manter e fazer crescer a conta</span>.</div></div>
+
+<div class="card" id="g6"><div class="card-header"><span class="card-num">06</span><span class="card-title">Como lidas com um cliente insatisfeito?</span></div>
+<div class="diagram"><div style="display:flex;flex-direction:column;gap:6px;width:100%;max-width:360px">
+  <div class="cf-step" style="border-color:rgba(239,68,68,0.3)"><div class="cf-icon">😤</div><div><div style="color:#ef4444;font-weight:700;font-family:'Space Mono',monospace;font-size:0.68rem">Reclamação recebida</div></div></div>
+  <div class="cf-step" style="animation-delay:.1s"><div class="cf-icon">👂</div><div><div style="color:#f0b429;font-family:'Space Mono',monospace;font-size:0.68rem">Escutar e entender</div><div style="color:var(--muted);font-size:0.6rem">Sem interromper, sem defender</div></div></div>
+  <div class="cf-step" style="animation-delay:.2s"><div class="cf-icon">🔍</div><div><div style="color:#f0b429;font-family:'Space Mono',monospace;font-size:0.68rem">Descobrir a causa</div></div></div>
+  <div class="cf-step" style="animation-delay:.3s"><div class="cf-icon">🛠️</div><div><div style="color:#f0b429;font-family:'Space Mono',monospace;font-size:0.68rem">Apresentar solução</div></div></div>
+  <div class="cf-step" style="animation-delay:.4s;border-color:rgba(16,185,129,0.3)"><div class="cf-icon">✅</div><div><div style="color:#10b981;font-family:'Space Mono',monospace;font-size:0.68rem">Acompanhar até resolver</div></div></div>
+</div></div>
+<div class="answer">Escutar → descobrir causa → apresentar solução → <span class="kw">acompanhar até resolver</span>. Reclamação bem gerida fortalece o relacionamento.</div></div>
+
+<div class="card" id="g7"><div class="card-header"><span class="card-num">07</span><span class="card-title">O que são Upsell e Cross-sell?</span></div>
+<div class="diagram"><div class="cmp-wrap">
+  <div class="cmp-box" style="border-color:rgba(240,180,41,0.4);background:rgba(240,180,41,0.06)"><div class="cmp-title" style="color:#f0b429">⬆️ UPSELL</div><div style="color:var(--muted)">Versão <strong style="color:var(--text)">superior</strong> do mesmo produto</div><div style="margin-top:8px;padding:6px;background:rgba(240,180,41,0.08);border-radius:7px;font-size:0.6rem;color:var(--muted)">Plano Básico → Plano Premium</div></div>
+  <div class="cmp-box" style="border-color:rgba(16,185,129,0.4);background:rgba(16,185,129,0.05)"><div class="cmp-title" style="color:#10b981">↔️ CROSS-SELL</div><div style="color:var(--muted)">Produto <strong style="color:var(--text)">complementar</strong></div><div style="margin-top:8px;padding:6px;background:rgba(16,185,129,0.08);border-radius:7px;font-size:0.6rem;color:var(--muted)">Suporte técnico → + Cibersegurança</div></div>
+</div></div>
+<div class="answer"><span class="kw">Upsell</span> = versão melhor do mesmo. <span class="kw">Cross-sell</span> = produto adicional relacionado. Aumentam receita sem novos clientes.</div></div>
+
+<div class="card" id="g8"><div class="card-header"><span class="card-num">08</span><span class="card-title">Como preparas uma reunião de acompanhamento?</span></div>
+<div class="diagram"><div class="flow-g" id="flow-g8">
+  <div class="flow-step-g">📊<br>Resultados</div><span class="flow-arrow-g">→</span>
+  <div class="flow-step-g" style="animation-delay:.1s">🐛<br>Problemas</div><span class="flow-arrow-g">→</span>
+  <div class="flow-step-g" style="animation-delay:.2s">📈<br>Utilização</div><span class="flow-arrow-g">→</span>
+  <div class="flow-step-g" style="animation-delay:.3s">💡<br>Melhorias</div><span class="flow-arrow-g">→</span>
+  <div class="flow-step-g" style="animation-delay:.4s">🎯<br>Próx. passos</div>
+</div></div>
+<div class="answer">Verificar: resultados, problemas, utilização, oportunidades, próximos passos. <span class="kw">QBR</span> = reunião trimestral de revisão do negócio.</div></div>
+
+<div class="card" id="g9"><div class="card-header"><span class="card-num">09</span><span class="card-title">Que métricas acompanhas?</span></div>
+<div class="diagram"><div class="kpi-grid">
+  <div class="kpi-card"><div class="kpi-val" id="g-nps">0</div><div class="kpi-label">NPS<br>Recomendar</div></div>
+  <div class="kpi-card"><div class="kpi-val" id="g-csat">0%</div><div class="kpi-label">CSAT<br>Satisfação</div></div>
+  <div class="kpi-card"><div class="kpi-val" id="g-churn">0%</div><div class="kpi-label">Churn<br>Cancelamentos</div></div>
+  <div class="kpi-card"><div class="kpi-val" id="g-nrr">0%</div><div class="kpi-label">NRR<br>Receita retida</div></div>
+</div></div>
+<div class="answer"><span class="kw">NPS</span> = recomendar. <span class="kw">CSAT</span> = satisfação. <span class="kw">Churn</span> = % que cancelou. <span class="kw">NRR</span> = receita mantida/crescida dos clientes existentes.</div></div>
+
+<div class="card" id="g10"><div class="card-header"><span class="card-num">10</span><span class="card-title">Como geres expectativas quando algo não pode ser entregue?</span></div>
+<div class="diagram"><div class="tag-cloud">
+  <span class="tag gold" style="animation-delay:.05s">✓ Ser honesto e claro</span>
+  <span class="tag gold" style="animation-delay:.15s">✓ Explicar o motivo</span>
+  <span class="tag gold" style="animation-delay:.25s">✓ Apresentar alternativas</span>
+  <span class="tag gold" style="animation-delay:.35s">✓ Informar prazos reais</span>
+  <span class="tag red" style="animation-delay:.45s">✗ Prometer o que não podes dar</span>
+  <span class="tag red" style="animation-delay:.55s">✗ Ignorar e esperar que passe</span>
+</div></div>
+<div class="answer">Ser <strong>honesto e claro</strong>, explicar o motivo, apresentar alternativas e <span class="kw">informar prazos reais</span>. Expectativas bem geridas evitam decepções maiores.</div></div>
+
+<div class="card" id="g11"><div class="card-header"><span class="card-num">11</span><span class="card-title">O que é CRM e para que serve?</span></div>
+<div class="diagram"><div class="rel-diagram">
+  <div class="rel-center">🖥️ CRM — Customer Relationship Management</div>
+  <div class="rel-spokes">
+    <span class="rel-spoke" style="animation-delay:.1s">📋 Contactos e histórico</span>
+    <span class="rel-spoke" style="animation-delay:.2s">💬 Conversas registadas</span>
+    <span class="rel-spoke" style="animation-delay:.3s">🐛 Problemas e tickets</span>
+    <span class="rel-spoke" style="animation-delay:.4s">💡 Oportunidades</span>
+    <span class="rel-spoke" style="animation-delay:.5s">✅ Tarefas e próximos passos</span>
+  </div>
+</div></div>
+<div class="answer"><strong>CRM</strong> = sistema para registar e organizar tudo sobre cada cliente. Ex: <span class="kw">Salesforce, HubSpot, Zoho</span>. Sem CRM, perde-se informação crítica.</div></div>
+
+<div class="card" id="g12"><div class="card-header"><span class="card-num">12</span><span class="card-title">Como identificas oportunidades de crescimento?</span></div>
+<div class="diagram"><div class="matrix-g">
+  <div class="mat-cell"><div class="icon">🗣️</div><div class="name">Conversar</div><div class="desc">Regularmente com o cliente</div></div>
+  <div class="mat-cell"><div class="icon">🔍</div><div class="name">Novas necessidades</div><div class="desc">O que mudou no negócio?</div></div>
+  <div class="mat-cell"><div class="icon">📊</div><div class="name">Uso do serviço</div><div class="desc">O que ainda não utiliza?</div></div>
+  <div class="mat-cell"><div class="icon">🌍</div><div class="name">Mercado</div><div class="desc">Mudanças no setor do cliente</div></div>
+</div></div>
+<div class="answer">Conversando regularmente, descobrindo novas necessidades e <span class="kw">analisando o que o cliente ainda não usa</span>. Oportunidade = necessidade não atendida.</div></div>
+
+<div class="card" id="g13"><div class="card-header"><span class="card-num">13</span><span class="card-title">O que fazes nos primeiros 30-60-90 dias numa nova conta?</span></div>
+<div class="diagram"><div class="plan-grid" id="plan-g13">
+  <div class="plan-box" style="border-color:rgba(240,180,41,0.5);background:rgba(240,180,41,0.06)"><div class="plan-day">30 dias</div><div style="font-size:1.3rem;margin-bottom:5px">🔍</div><div class="plan-desc">Conhecer o cliente, pessoas e histórico</div></div>
+  <div class="plan-box" style="animation-delay:.15s;border-color:rgba(16,185,129,0.4);background:rgba(16,185,129,0.05)"><div class="plan-day" style="color:#10b981">60 dias</div><div style="font-size:1.3rem;margin-bottom:5px">🎯</div><div class="plan-desc">Identificar necessidades, problemas e riscos</div></div>
+  <div class="plan-box" style="animation-delay:.3s;border-color:rgba(124,58,237,0.4);background:rgba(124,58,237,0.05)"><div class="plan-day" style="color:#a78bfa">90 dias</div><div style="font-size:1.3rem;margin-bottom:5px">🚀</div><div class="plan-desc">Plano de ação + primeiros <span style="color:#a78bfa">quick wins</span></div></div>
+</div></div>
+<div class="answer"><span class="kw">30 dias</span> = conhecer. <span class="kw">60 dias</span> = identificar problemas. <span class="kw">90 dias</span> = agir e mostrar resultados. <strong>Quick wins</strong> = melhorias rápidas para ganhar confiança.</div></div>
+
+<div class="card" id="g14"><div class="card-header"><span class="card-num">14</span><span class="card-title">Como trabalhas com as equipas internas?</span></div>
+<div class="diagram"><div class="cs-diagram-g">
+  <div class="cs-box-g" style="border-color:rgba(240,180,41,0.4);background:rgba(240,180,41,0.06)"><span style="font-size:1.5rem">🏢</span><span style="color:#f0b429;font-weight:700;font-family:'Space Mono',monospace;font-size:0.66rem">CLIENTE</span></div>
+  <div class="cs-arrow-mid"><span>→ transmite →</span><div style="font-size:1.3rem;padding:4px">🧑‍💼</div><span style="color:#f0b429;font-family:'Space Mono',monospace;font-size:0.6rem">Gestor AM</span><span>→ prioriza →</span></div>
+  <div class="cs-box-g" style="border-color:rgba(16,185,129,0.4);background:rgba(16,185,129,0.05)"><span style="font-size:1.5rem">⚙️</span><span style="color:#10b981;font-weight:700;font-family:'Space Mono',monospace;font-size:0.66rem">EQUIPA TÉC.</span></div>
+</div></div>
+<div class="answer"><strong>Comunicar claramente</strong> o que o cliente precisa, transmitir prioridades às equipas técnicas e <span class="kw">acompanhar a execução</span>. O Gestor é a ponte.</div></div>
+
+<div class="card" id="g15"><div class="card-header"><span class="card-num">15</span><span class="card-title">O que é um SLA?</span></div>
+<div class="diagram"><div class="matrix-g">
+  <div class="mat-cell"><div class="icon">⏱️</div><div class="name">Tempo de resposta</div><div class="desc">Máximo para responder</div></div>
+  <div class="mat-cell"><div class="icon">🛠️</div><div class="name">Tempo de resolução</div><div class="desc">Máximo para resolver</div></div>
+  <div class="mat-cell"><div class="icon">📶</div><div class="name">Disponibilidade</div><div class="desc">% uptime garantido</div></div>
+  <div class="mat-cell"><div class="icon">📋</div><div class="name">Acompanhar</div><div class="desc">Gestor verifica cumprimento</div></div>
+</div></div>
+<div class="answer"><strong>SLA</strong> = Service Level Agreement. Acordo que define o <span class="kw">nível de serviço prometido</span>: tempo de resposta, resolução e disponibilidade.</div></div>
+
+<div class="card" id="g16"><div class="card-header"><span class="card-num">16</span><span class="card-title">Como medes o teu sucesso como Gestor Júnior?</span></div>
+<div class="diagram"><div class="bar-chart">
+  <div class="bar-col"><div class="bar-fill" id="gb1"></div><div class="bar-label">Clientes<br>retidos</div></div>
+  <div class="bar-col"><div class="bar-fill" id="gb2"></div><div class="bar-label">Cresci-<br>mento</div></div>
+  <div class="bar-col"><div class="bar-fill" id="gb3"></div><div class="bar-label">Satisfa-<br>ção</div></div>
+  <div class="bar-col"><div class="bar-fill" id="gb4"></div><div class="bar-label">Metas<br>receita</div></div>
+  <div class="bar-col"><div class="bar-fill" id="gb5"></div><div class="bar-label">Qualidade<br>relação</div></div>
+</div></div>
+<div class="answer">Clientes mantidos, crescimento das contas, satisfação, cumprimento de metas e <span class="kw">qualidade do relacionamento com clientes e equipas</span>.</div></div>
+
+<div class="card" id="g17"><div class="card-header"><span class="card-num">17</span><span class="card-title">Retenção — como manter clientes?</span></div>
+<div class="diagram"><div class="tag-cloud">
+  <span class="tag gold" style="animation-delay:.05s">✓ Atendimento rápido</span>
+  <span class="tag gold" style="animation-delay:.15s">✓ Entrega de valor constante</span>
+  <span class="tag gold" style="animation-delay:.25s">✓ Resolução ágil de problemas</span>
+  <span class="tag gold" style="animation-delay:.35s">✓ Check-ins proativos</span>
+  <span class="tag red" style="animation-delay:.45s">✗ Ignorar reclamações</span>
+  <span class="tag red" style="animation-delay:.55s">✗ Contato só quando há problemas</span>
+</div></div>
+<div class="answer">Reter é <strong>5× mais barato</strong> do que conquistar um novo cliente. Começa antes do cliente pensar em sair — com <span class="kw">valor proativo e presença constante</span>.</div></div>
+
+<div class="card" id="g18"><div class="card-header"><span class="card-num">18</span><span class="card-title">Segmentação ABC de clientes</span></div>
+<div class="diagram"><div class="ring-wrap">
+  <div class="ring-item"><div class="ring-box"><svg class="ring-svg" viewBox="0 0 80 80"><circle class="ring-bg" cx="40" cy="40" r="30"/><circle class="ring-fg" id="rg-a" cx="40" cy="40" r="30" stroke="#f0b429"/></svg><span class="ring-val">A</span></div><div class="ring-label">Alta prioridade<br>20% → 80% receita</div></div>
+  <div class="ring-item"><div class="ring-box"><svg class="ring-svg" viewBox="0 0 80 80"><circle class="ring-bg" cx="40" cy="40" r="30"/><circle class="ring-fg" id="rg-b" cx="40" cy="40" r="30" stroke="#10b981"/></svg><span class="ring-val">B</span></div><div class="ring-label">Média prioridade<br>potencial crescimento</div></div>
+  <div class="ring-item"><div class="ring-box"><svg class="ring-svg" viewBox="0 0 80 80"><circle class="ring-bg" cx="40" cy="40" r="30"/><circle class="ring-fg" id="rg-c" cx="40" cy="40" r="30" stroke="#64748b"/></svg><span class="ring-val">C</span></div><div class="ring-label">Baixa prioridade<br>gerir em escala</div></div>
+</div></div>
+<div class="answer">Regra de <strong>Pareto (80/20)</strong>: 20% dos clientes geram 80% da receita — esses merecem atenção máxima. <span class="kw">Não tratas todos da mesma forma.</span></div></div>
+
+<div class="section-title" id="g19">— Siglas Principais para Memorizar</div>
+<div class="card" id="g19-card" style="padding:0;overflow:hidden;">
+  <div style="padding:18px;">
+    <table class="sig-table">
+      <thead><tr><th>Sigla</th><th>Significado</th><th>Em palavras simples</th></tr></thead>
+      <tbody>
+        <tr><td>AM</td><td>Account Manager</td><td>Gestor de Contas</td></tr>
+        <tr><td>CS</td><td>Customer Success</td><td>Sucesso do Cliente</td></tr>
+        <tr><td>ARR</td><td>Annual Recurring Revenue</td><td>Receita recorrente anual</td></tr>
+        <tr><td>MRR</td><td>Monthly Recurring Revenue</td><td>Receita recorrente mensal</td></tr>
+        <tr><td>QBR</td><td>Quarterly Business Review</td><td>Revisão trimestral do negócio</td></tr>
+        <tr><td>NPS</td><td>Net Promoter Score</td><td>Probabilidade de recomendar</td></tr>
+        <tr><td>CSAT</td><td>Customer Satisfaction Score</td><td>Satisfação do cliente</td></tr>
+        <tr><td>NRR</td><td>Net Revenue Retention</td><td>Retenção/crescimento da receita</td></tr>
+        <tr><td>CRM</td><td>Customer Relationship Management</td><td>Gestão do relacionamento</td></tr>
+        <tr><td>SLA</td><td>Service Level Agreement</td><td>Acordo sobre o nível de serviço</td></tr>
+        <tr><td>B2B</td><td>Business to Business</td><td>Empresa que vende para empresa</td></tr>
+        <tr><td>MSP</td><td>Managed Service Provider</td><td>Empresa de serviços de TI geridos</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section-title" id="g20">— Termos que Podem Causar Confusão</div>
+<div class="card" id="g20-card" style="padding:0;overflow:hidden;">
+  <div style="padding:18px;">
+    <table class="sig-table">
+      <thead><tr><th>Termo</th><th>Significado</th></tr></thead>
+      <tbody>
+        <tr><td>Churn</td><td>Perda ou cancelamento de clientes</td></tr>
+        <tr><td>Pipeline</td><td>Conjunto de oportunidades comerciais em andamento</td></tr>
+        <tr><td>Stakeholders</td><td>Pessoas com influência numa conta ou negócio</td></tr>
+        <tr><td>Upsell</td><td>Vender versão superior do que o cliente já possui</td></tr>
+        <tr><td>Cross-sell</td><td>Vender produto ou serviço complementar</td></tr>
+        <tr><td>Ticket</td><td>Pedido ou problema registado para a equipa tratar</td></tr>
+        <tr><td>Carteira</td><td>Conjunto de clientes sob responsabilidade do Gestor</td></tr>
+        <tr><td>Quick win</td><td>Pequena melhoria ou resultado alcançável rapidamente</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section-title">— Resumo Final</div>
+<div class="card" id="g-final">
+  <div class="diagram" style="flex-direction:column;gap:13px;">
+    <div style="font-family:'Space Mono',monospace;font-size:0.7rem;color:#f0b429;text-align:center;line-height:1.9;">Conhecer o cliente · Manter a relação · Resolver problemas<br>Evitar cancelamentos · Encontrar oportunidades de crescimento</div>
+    <div class="tag-cloud">
+      <span class="tag gold" style="animation-delay:.05s">Curiosidade</span>
+      <span class="tag gold" style="animation-delay:.12s">Organização</span>
+      <span class="tag gold" style="animation-delay:.19s">Empatia</span>
+      <span class="tag gold" style="animation-delay:.26s">Comunicação clara</span>
+      <span class="tag gold" style="animation-delay:.33s">Vontade de aprender</span>
+    </div>
+  </div>
+  <div class="answer" style="text-align:center;">Um Gestor Júnior <strong>não precisa saber tudo tecnicamente</strong>. É importante demonstrar <span class="kw">curiosidade, organização, empatia, comunicação clara e vontade de aprender</span>.</div>
+</div>
+
+</main>
+</div>
+
+<script>
+// ---- TAB SWITCHING ----
+function switchTab(tab) {
+  const isRedes = tab === 'redes';
+  document.body.className = isRedes ? '' : 'tab-gestao';
+  document.getElementById('mod-redes').classList.toggle('active', isRedes);
+  document.getElementById('mod-gestao').classList.toggle('active', !isRedes);
+  document.getElementById('btn-redes').classList.toggle('active', isRedes);
+  document.getElementById('btn-gestao').classList.toggle('active', !isRedes);
+  document.getElementById('main-title').textContent = isRedes ? '// REDES DE COMPUTADORES' : '// GESTÃO DE CONTAS';
+  document.getElementById('main-sub').textContent = isRedes ? '15 conceitos fundamentais — guia visual animado' : 'Guia completo Júnior · 18 temas · Siglas · Termos';
+  window.scrollTo({top:0, behavior:'smooth'});
+  if (!isRedes) setTimeout(observeGestao, 100);
+}
+
+// ---- NAV ----
+function goToR(n) {
+  document.getElementById('r'+n)?.scrollIntoView({behavior:'smooth',block:'start'});
+  document.querySelectorAll('#nav-redes .pill').forEach((p,i)=>p.classList.toggle('active',i===n-1));
+}
+function goToG(n) {
+  const ids = {19:'g19',20:'g20'};
+  const el = document.getElementById(ids[n]||'g'+n);
+  el?.scrollIntoView({behavior:'smooth',block:'start'});
+  document.querySelectorAll('#nav-gestao .pill').forEach((p,i)=>p.classList.toggle('active',i===n-1));
+}
+
+// ---- REDES OBSERVER ----
+const obsR = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(!e.isIntersecting) return;
+    const c=e.target; c.classList.add('visible');
+    const id=c.id;
+    if(id==='r5'){setTimeout(()=>{document.getElementById('bar-lan').style.width='30%';document.getElementById('bar-man').style.width='62%';document.getElementById('bar-wan').style.width='98%';},200);}
+    if(id==='r10'){c.querySelectorAll('.proto-layer').forEach((l,i)=>setTimeout(()=>l.classList.add('in'),i*200+100));}
+    if(id==='r11'){setTimeout(()=>{document.getElementById('speed-wire').style.width='90%';document.getElementById('speed-wifi').style.width='65%';},300);}
+    const n=parseInt(id.replace('r',''));
+    if(!isNaN(n)) document.querySelectorAll('#nav-redes .pill').forEach((p,i)=>p.classList.toggle('active',i===n-1));
+  });
+},{threshold:0.25});
+document.querySelectorAll('#mod-redes .card').forEach(c=>obsR.observe(c));
+
+// Device pulse
+const devs=['d1','d2','d3','d4']; let cur=0;
+setInterval(()=>{devs.forEach(d=>document.getElementById(d)?.classList.remove('active'));document.getElementById(devs[cur])?.classList.add('active');cur=(cur+1)%devs.length;},800);
+
+// ---- GESTAO OBSERVER ----
+function observeGestao(){
+  const obsG=new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(!e.isIntersecting) return;
+      const c=e.target; c.classList.add('visible');
+      const id=c.id;
+      if(id==='g3') c.querySelectorAll('.tier-card').forEach((t,i)=>setTimeout(()=>t.classList.add('in'),i*180+80));
+      if(id==='g6') c.querySelectorAll('.cf-step').forEach((s,i)=>setTimeout(()=>s.classList.add('in'),i*120+80));
+      if(id==='g8') c.querySelectorAll('.flow-step-g').forEach((s,i)=>setTimeout(()=>s.classList.add('in'),i*140+80));
+      if(id==='g9'){animC('g-nps',0,72,1200,'');animC('g-csat',0,88,1300,'%');animC('g-churn',0,6,900,'%');animC('g-nrr',0,104,1400,'%');}
+      if(id==='g13') c.querySelectorAll('.plan-box').forEach((b,i)=>setTimeout(()=>b.classList.add('in'),i*200+80));
+      if(id==='g16'){const v=[85,70,92,78,88];['gb1','gb2','gb3','gb4','gb5'].forEach((bid,i)=>setTimeout(()=>{const el=document.getElementById(bid);if(el)el.style.height=v[i]*0.75+'px';},i*120+200));}
+      if(id==='g18'){setTimeout(()=>{setRing('rg-a',0.85);setRing('rg-b',0.55);setRing('rg-c',0.30);},300);}
+    });
+  },{threshold:0.2});
+  document.querySelectorAll('#mod-gestao .card').forEach(c=>obsG.observe(c));
+}
+
+function animC(id,from,to,dur,sfx){const el=document.getElementById(id);if(!el)return;const step=(to-from)/(dur/16);let cur=from;const iv=setInterval(()=>{cur=Math.min(cur+step,to);el.textContent=Math.round(cur)+sfx;if(cur>=to)clearInterval(iv);},16);}
+function setRing(id,pct){const el=document.getElementById(id);if(!el)return;const c=2*Math.PI*30;el.style.strokeDasharray=c;el.style.strokeDashoffset=c*(1-pct);el.style.transition='stroke-dashoffset 1.4s ease';}
+</script>
+</body>
+</html>
